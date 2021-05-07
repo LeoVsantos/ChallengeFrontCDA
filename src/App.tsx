@@ -1,26 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import { theme } from './styles/theme';
+import { ChakraProvider } from "@chakra-ui/react"
+
+import { SidebarDrawerProvider } from './contexts/SidebarDrawerContext';
+
+import AppProvider from './hooks';
+
+import Routes from './routes';
+
+const App: React.FC = () => (
+  <Router>
+    <ChakraProvider theme={theme}>
+      <SidebarDrawerProvider>
+        <AppProvider>
+          <Routes />
+        </AppProvider>
+      </SidebarDrawerProvider>
+    </ChakraProvider>
+  </Router>
+);
 
 export default App;
