@@ -10,5 +10,5 @@ Utilizei alguns conceitos novos como:
   - `React Hooks`
   - `API CONTEXT` - Nova feature do React
 
-### `API CONTEXT`
- - # Nao utilizei redux, mas utilizei o mesmo metodo que o REDUX utiliza. (nova feature do react)
+### `REDUX ?`
+ - Nao utilizei redux, utilizei um recurso nativo (API CONTEXT). bem semelhante ao redux so que com mais performance.
