@@ -25,7 +25,7 @@ import { RiAddLine, RiDeleteBin2Line, RiEyeLine, RiPencilLine } from "react-icon
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "../../services/apiClient";
 import { SearchBox } from "../../components/SearchBox";
 import { RadioCard } from "../../components/Form/Radio";
@@ -61,7 +61,7 @@ export default function UserList(){
     })
   }, [])
 
-  const handleFilterStatus = (data: string) => {
+  const handleFilterStatus = useCallback((data: string) => {
     let filter = 1;
     setStatusFilter(1)
     if(data === 'Inativo'){
@@ -70,7 +70,7 @@ export default function UserList(){
     }
     const penalCodesFiltered = allData.filter(data => data.status === filter)
     setPenalCodes(penalCodesFiltered)
-  }
+  }, [allData])
 
   const handleSearch = (value: string) => {
     const search = value.toLowerCase();
@@ -92,10 +92,10 @@ export default function UserList(){
     }
   }
 
-  const resetPenalCodes = () => {
+  const resetPenalCodes = useCallback(() => {
     setPenalCodes(allData)
     setStatusFilter(0)
-  }
+  }, [allData])
 
   const options = ["Ativo", "Inativo", "Todos"]
 
@@ -111,7 +111,6 @@ export default function UserList(){
   })
 
   const group = getRootProps()
-
 
   return (
     <Box>
@@ -145,120 +144,116 @@ export default function UserList(){
               <Spinner />
             </Flex>
           ): (
- 
-        <Box>
+          <Box>
+            <Flex w="100%" py="4">
+              <HStack justify="flex-end" w="100%" spacing='4' {...group}>
+              <Text>Filtrar:</Text>
+              {options.map((value) => {
+                const radio = getRadioProps({ value })
+                return (
+                  <RadioCard key={value} {...radio}>
+                    {value}
+                  </RadioCard>
+                )
+              })}
+                
+              </HStack>
+            </Flex>
+
+            <Flex py="4" flex="1">
+                <SearchBox placeholder="Buscar..." onChange={(e) => handleSearch(e.target.value)} />     
+            </Flex>
 
 
-
-          <Flex w="100%" py="4">
-            <HStack justify="flex-end" w="100%" spacing='4' {...group}>
-            <Text>Filtrar:</Text>
-            {options.map((value) => {
-              const radio = getRadioProps({ value })
-              return (
-                <RadioCard key={value} {...radio}>
-                  {value}
-                </RadioCard>
-              )
-            })}
-              
-            </HStack>
-          </Flex>
-
-          <Flex py="4" flex="1">
-              <SearchBox placeholder="Buscar..." onChange={(e) => handleSearch(e.target.value)} />     
-          </Flex>
-
-
-          <Table colorschema="whiteAlpha">
-            <Thead>
-              <Tr>
-                <Th px={["2", "2", "4"]} color="gray.300" width="8">
-                  <Checkbox />
-                </Th>
-                <Th>Nome</Th>
-                <Th>Data</Th>
-                <Th>Multa</Th>
-                <Th>Status</Th>
-                <Th>Acao</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-                {penalCodes.map(penalcode => (
-                     
-                      <Tr key={penalcode.id}>
-                         <Td px={["2", "2", "4"]}>
-                             <Checkbox  />
-                           </Td>
-                           <Td>
-                             <Box>
-                               <Text fontWeight="bold">{penalcode.nome}</Text>
-                               <Text noOfLines={2} fontSize="sm" color="gray.300">{penalcode.descricao}</Text>
-                             </Box>
-                           </Td>
-                           <Td> 
-                             {
-                                new Date(penalcode.dataCriacao).toLocaleDateString('pt-BR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                })
-                              }
+            <Table colorschema="whiteAlpha">
+              <Thead>
+                <Tr>
+                  <Th px={["2", "2", "4"]} color="gray.300" width="8">
+                    <Checkbox />
+                  </Th>
+                  <Th>Nome</Th>
+                  <Th>Data</Th>
+                  <Th>Multa</Th>
+                  <Th>Status</Th>
+                  <Th>Acao</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                  {penalCodes.map(penalcode => (
+                      
+                        <Tr key={penalcode.id}>
+                          <Td px={["2", "2", "4"]}>
+                              <Checkbox  />
                             </Td>
-                           <Td>
-                          {
-                            new Intl.NumberFormat('pt-BR', {
-                              style: 'currency',
-                              currency: 'BRL'
-                            }).format(penalcode.multa)
-                          } 
-                          </Td>
-                           <Td> {penalcode.status === 1 ? 'Ativo' : 'Inativo'} </Td>
-                           <Td> 
-                              <Stack spacing="2" direction="row">
+                            <Td>
+                              <Box>
+                                <Text fontWeight="bold">{penalcode.nome}</Text>
+                                <Text noOfLines={2} fontSize="sm" color="gray.300">{penalcode.descricao}</Text>
+                              </Box>
+                            </Td>
+                            <Td> 
+                              {
+                                  new Date(penalcode.dataCriacao).toLocaleDateString('pt-BR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                  })
+                                }
+                              </Td>
+                            <Td>
+                            {
+                              new Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                              }).format(penalcode.multa)
+                            } 
+                            </Td>
+                            <Td> {penalcode.status === 1 ? 'Ativo' : 'Inativo'} </Td>
+                            <Td> 
+                                <Stack spacing="2" direction="row">
+                                  <IconButton 
+                                    as={Link}
+                                    to={`/legislation/view/${penalcode.id}`}
+                                    aria-label="Visualizar" 
+                                    icon={<RiEyeLine />}
+                                    bg="blue.primary" 
+                                    _hover={{ bg: "blue.secondary"}}
+                                  /> 
                                 <IconButton 
-                                  as={Link}
-                                  to={`/legislation/view/${penalcode.id}`}
-                                  aria-label="Visualizar" 
-                                  icon={<RiEyeLine />}
-                                  bg="blue.primary" 
-                                  _hover={{ bg: "blue.secondary"}}
-                                /> 
-                              <IconButton 
-                                  as={Link}
-                                  to={`/legislation/${penalcode.id}`}
-                                  aria-label="Editar" 
-                                  icon={<RiPencilLine />}
-                                  bg="green.500" 
-                                  _hover={{ bg: "green.600"}}
-                                /> 
-                              <IconButton 
-                                  aria-label="Excluir" 
-                                  icon={<RiDeleteBin2Line />}
-                                  onClick={() => setIsOpen(penalcode.id)}
-                                  bg="red.500" 
-                                  _hover={{ bg: "red.600"}}
-                                /> 
-                              </Stack>
-                            </Td>
+                                    as={Link}
+                                    to={`/legislation/${penalcode.id}`}
+                                    aria-label="Editar" 
+                                    icon={<RiPencilLine />}
+                                    bg="green.500" 
+                                    _hover={{ bg: "green.600"}}
+                                  /> 
+                                <IconButton 
+                                    aria-label="Excluir" 
+                                    icon={<RiDeleteBin2Line />}
+                                    onClick={() => setIsOpen(penalcode.id)}
+                                    bg="red.500" 
+                                    _hover={{ bg: "red.600"}}
+                                  /> 
+                                </Stack>
+                              </Td>
 
-                          <DialogModal 
-                            isOpen={isOpen === penalcode.id} 
-                            onClose={onClose} 
-                            modalTitle={`Remover codigo penal: ${penalcode.nome}`} 
-                            modalBody={
-                              `Tem certeza que deseja remover esse codigo penal ? `
-                            }
-                            buttonLoading={isOpen === penalcode.id && buttonLoading}
-                            onDelete={() => { handleDelete(penalcode.id) }}
-                          />
-                        </Tr>
-                    ))}
-            </Tbody>
-          </Table>
-        </Box>
+                            <DialogModal 
+                              isOpen={isOpen === penalcode.id} 
+                              onClose={onClose} 
+                              modalTitle={`Remover codigo penal: ${penalcode.nome}`} 
+                              modalBody={
+                                `Tem certeza que deseja remover esse codigo penal ? `
+                              }
+                              buttonLoading={isOpen === penalcode.id && buttonLoading}
+                              onDelete={() => { handleDelete(penalcode.id) }}
+                            />
+                          </Tr>
+                      ))}
+              </Tbody>
+            </Table>
+          </Box>
         )}
-        <Pagination />
+          <Pagination />
         </Box>
       </Flex>
     </Box>
