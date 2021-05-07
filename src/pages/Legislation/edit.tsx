@@ -58,8 +58,7 @@ export default function CreateUser(){
   useEffect(() => {
     api.get<legislationProps>(`/legislation/${id}`).then(response => {
       setLegislation(response.data)
-      console.log('multa', String(response.data.multa.toFixed(2)));
-      setValue(String(response.data.multa.toFixed(2)));
+      setValue(String(response.data.multa));
       setLoading(false)
     })
   }, [id])
@@ -86,7 +85,7 @@ export default function CreateUser(){
   
     const { errors } = formState;
   
-    const handleSignIn: SubmitHandler<CreateLegislationForm> = async ({nome, descricao, multa, status, tempoPrisao}) => {
+    const handleAddLegislation: SubmitHandler<CreateLegislationForm> = async ({nome, descricao, multa, status, tempoPrisao}) => {
       setLoading(true)    
       try {
         const multaUnmaskNumber = Number(value.replace('.', '').replace(',', '.'));
@@ -101,7 +100,7 @@ export default function CreateUser(){
 
           const response = await api.put(`/legislation/${id}`, data);
           setLegislation(response.data);
-          setValue(String(response.data.multa.toFixed(2)));
+          setValue(String(response.data.multa));
 
           toast({
             title: "Salvo com sucesso",
@@ -139,7 +138,7 @@ export default function CreateUser(){
           flex="1" 
           borderRadius={8} 
           bg="gray.800" p={["6", "8"]} 
-          onSubmit={handleSubmit(handleSignIn)}
+          onSubmit={handleSubmit(handleAddLegislation)}
         >
           <Heading size="lg" fontWeight="normal">Editar decreto</Heading>
 
